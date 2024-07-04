@@ -63,6 +63,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    role          Role      @default(USER)
 }
 
 model VerificationToken {
@@ -71,4 +72,9 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+enum Role {
+    USER
+    ADMIN
 }
