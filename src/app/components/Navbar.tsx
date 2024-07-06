@@ -9,14 +9,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { ThemeToggler } from "./ThemeToggler";
-import { Button } from "~/components/ui/button";
 import { getServerAuthSession } from "~/server/auth";
+import { SignInButton } from "./SignInButton";
+import { SignOutButton } from "./SignOutButton";
+import { ThemeToggler } from "./ThemeToggler";
 
 export default async function Navbar() {
   const session = await getServerAuthSession();
+
   return (
-    <nav className="container flex items-center p-8 dark:text-white">
+    <nav className="container flex items-center px-8 py-3 dark:text-white md:border-b md:border-muted-foreground">
       <Link href={"/"} className="lg:mr-40">
         <Image
           src={"/images/logo/logo.svg"}
@@ -39,28 +41,31 @@ export default async function Navbar() {
         {/* mobile section */}
         <div className="flex md:hidden">
           <DropdownMenu>
-            <DropdownMenuTrigger className="border-secondary dark rounded-md border p-1">
+            <DropdownMenuTrigger className="dark rounded-md border border-secondary p-1">
               <MenuIcon />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-60">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
+              {session ? (
+                <>
+                  <DropdownMenuLabel>{session.user.name}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Link href={"/profile"}>Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <SignOutButton />
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <SignInButton />
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
         {/* mobile section */}
 
         <div className="ml-auto hidden md:flex">
-          {session ? (
-            <Button size={"sm"} variant={"ghost"} /* onClick={() =>} */>
-              Logout
-            </Button>
-          ) : (
-            <Button size={"sm"} variant={"ghost"}>
-              Login
-            </Button>
-          )}
+          {session ? <SignOutButton /> : <SignInButton />}
         </div>
       </div>
     </nav>

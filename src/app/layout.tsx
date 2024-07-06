@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import Navbar from "./components/Navbar";
+import UserActions from "./components/UserActions";
 
 export const metadata = {
   title: "Create T3 App",
@@ -21,7 +22,13 @@ export default function RootLayout({
       <body className="bg-secondary dark:bg-sky-950">
         <TRPCReactProvider>
           <Navbar />
-          {children}
+
+          <main className="flex">
+            <aside className="hidden w-80 shrink border-r border-muted-foreground p-8 md:flex md:items-start">
+              <UserActions />
+            </aside>
+            <section className="container">{children}</section>
+          </main>
         </TRPCReactProvider>
       </body>
     </html>

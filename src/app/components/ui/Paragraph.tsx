@@ -3,7 +3,7 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { cn } from "~/lib/utils";
 
 export const paragraphVariants = cva(
-  "text-black font-sans tracking-widest dark:text-slate-700 text-center",
+  "font-sans tracking-wide text-foreground text-center",
   {
     variants: {
       size: {
@@ -25,7 +25,7 @@ export const paragraphVariants = cva(
 
     defaultVariants: {
       size: "default",
-      weight: "light",
+      weight: "medium",
     },
   },
 );

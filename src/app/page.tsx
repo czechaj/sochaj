@@ -1,16 +1,16 @@
-import Link from "next/link";
-
 import { CreatePost } from "~/app/_components/create-post";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
 import { PostCard } from "./_components/post-card";
+import { Paragraph } from "./components/ui/Paragraph";
 
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
   const session = await getServerAuthSession();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center text-white">
+    <main className="flex min-h-screen flex-col items-center p-5 text-white">
+      <CrudShowcase />
       {/*  <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
           Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
@@ -49,7 +49,6 @@ export default async function Home() {
               {session && <span>Logged in as {session.user?.name}</span>}
             </p>
             <Link
-              href={session ? "/api/auth/signout" : "/api/auth/signin"}
               className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
             >
               {session ? "Sign out" : "Sign in"}
@@ -70,14 +69,14 @@ async function CrudShowcase() {
   const latestPosts = await api.post.getAll();
 
   return (
-    <div className="w-full max-w-xs space-y-3">
+    <div className="w-full space-y-3">
+      <CreatePost />
+
       {latestPosts.length ? (
         latestPosts.map((p) => <PostCard key={p.id} {...p} />)
       ) : (
-        <p>You have no posts yet.</p>
+        <Paragraph>You have no posts yet.</Paragraph>
       )}
-
-      <CreatePost />
     </div>
   );
 }

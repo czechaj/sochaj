@@ -2,8 +2,10 @@
 
 import { type Post } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { Button } from "~/components/ui/button";
 
 import { api } from "~/trpc/react";
+import { Paragraph } from "../components/ui/Paragraph";
 
 export function PostCard(post: Post) {
   const router = useRouter();
@@ -20,11 +22,11 @@ export function PostCard(post: Post) {
         e.preventDefault();
         deletePost.mutate({ id: post.id });
       }}
-      className="flex w-full items-center justify-between rounded-md bg-gray-500/20 p-4"
+      className="flex w-full items-center justify-between rounded-md bg-background p-4"
     >
       <div className="flex flex-col gap-2">
-        <span>{post.name}</span>
-        <span className="text-xs">
+        <Paragraph className="text-left">{post.content}</Paragraph>
+        <span className="text-xs text-muted-foreground/80">
           {new Date(post.createdAt).toLocaleDateString("tr-TR", {
             dateStyle: "medium",
           })}{" "}
@@ -34,13 +36,14 @@ export function PostCard(post: Post) {
         </span>
       </div>
 
-      <button
+      <Button
         type="submit"
-        className="h-fit rounded-md bg-red-600 px-3 py-1.5 text-sm"
+        size={"sm"}
+        variant={"destructive"}
         disabled={deletePost.isPending}
       >
         {deletePost.isPending ? "Deleting..." : "Delete"}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -11,7 +11,7 @@ function useDarkMode() {
   const [theme, setTheme] = useState<keyof typeof THEME_COLORS>(
     typeof window !== "undefined"
       ? (localStorage.theme as ThemeColors)
-      : "dark",
+      : "light",
   );
   const colorTheme = theme === "dark" ? "light" : "dark";
 
