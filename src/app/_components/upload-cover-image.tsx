@@ -8,30 +8,43 @@ import { api } from "~/trpc/react";
 const UploadCoverImage = () => {
   const router = useRouter();
 
-  const [image, setImage] = useState<File>();
+  const [file, setFile] = useState<File>();
 
   const uploadImage = api.image.upload.useMutation({
-    onSuccess: () => {
-      router.refresh();
-      setImage(undefined);
+    onSuccess: async ({ uploadUrl }) => {
+      try {
+        await fetch(uploadUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file?.type ?? "application/json",
+          },
+        });
+
+        router.refresh();
+        setFile(undefined);
+      } catch (err) {
+        console.error(err);
+      }
     },
   });
 
-  async function handleUploadImage(e: FormEvent) {
+  const handleUploadImage = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!image) return;
-    console.log("🚀 ~ handleUploadImage ~ image:", image);
+    if (!file) return;
+
     uploadImage.mutate({
-      image,
+      file,
     });
-  }
+  };
 
   return (
     <form onSubmit={handleUploadImage} className="flex flex-col gap-2">
       <input
         type="file"
-        onChange={(e) => setImage(e.target.files?.[0])}
+        accept="image/png, image/jpg, image/jpeg"
+        onChange={(e) => setFile(e.target.files?.[0])}
         className="w-full rounded-md px-4 py-2 text-black"
       />
       <Button

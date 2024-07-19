@@ -1,34 +1,73 @@
-import { z } from "zod";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Upload } from "@aws-sdk/lib-storage";
+import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { r2 } from "~/lib/r2";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { env } from "~/env";
+import { randomUUID } from "crypto";
+import { r2 } from "~/lib/r2";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const imageRouter = createTRPCRouter({
   upload: protectedProcedure
-    .input(z.object({ image: z.any() }))
+    .input(z.unknown())
     .mutation(async ({ ctx, input }) => {
-      console.log("🚀 ~ upload:protectedProcedure.input ~ input:", input);
-
-      const signedUrl = await getSignedUrl(
+      const key = randomUUID();
+      const presignedUrl = await getSignedUrl(
         r2,
         new PutObjectCommand({
-          Bucket: `${env.R2_BUCKET_NAME}`,
-          Key: Date.now().toString() + "_",
+          Bucket: "sochaj",
+          Key: key,
+          ACL: "public-read",
         }),
-        { expiresIn: 60 },
+        {
+          expiresIn: 60 * 60,
+        },
       );
 
-      const data = await fetch(signedUrl, {
-        method: "PUT",
-        body: input.image,
-        
-      })
+      const imageUrl =
+        "https://6c5243353584941593a8ef61386e4e3e.r2.cloudflarestorage.com/sochaj/" +
+        key;
 
-      console.log("🚀 ~ .mutation ~ signedUrl:", data);
+      await ctx.db.user.update({
+        where: {
+          id: ctx.session.user.id,
+        },
+        data: {
+          image: imageUrl,
+        },
+      });
+
+      return {
+        uploadUrl: presignedUrl,
+      };
+
+      /*   await Promise.all(
+        urls.map((url, index) => {
+          return fetch(url, {
+            method: "PUT",
+            body: input.files?.[index],
+            headers: {
+              "Content-Type": (input.images?.[index] as File).type,
+            },
+          });
+        }),
+      ); */
+
+      /*       const fileName = input.name;
+      const fileSize = input.size;
+      const fileType = input.type; */
+      // const objectKey = `${fileName}`;
+
+      /*  if (fileSize > 10 * 1024) {
+        throw new Error("File size is too large");
+      } */
+
+      /*  
+
+     const imageUrl = `https://6c5243353584941593a8ef61386e4e3e.r2.cloudflarestorage.com/sochaj/${objectKey}`;
+     const presignedUrl = await getSignedUrl(r2, cmd, { expiresIn: 3600 });
+
+
+      */
 
       /*  return ctx.db.post.create({
         data: {
